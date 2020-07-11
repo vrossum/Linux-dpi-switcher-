@@ -1,0 +1,33 @@
+#!/bin/bash
+# This file should go in /etc/udev/
+
+# the next line is recommended on https://unix.stackexchange.com/questions/14854/xrandr-command-not-executed-within-shell-command-called-from-udev-rule
+# but display = :1 not :0
+#https://askubuntu.com/questions/457016/how-to-change-gsettings-via-remote-shell
+#if  evertyhing works, calling this script as root should  work
+export XAUTHORITY=/home/vrossum/.Xauthority
+# to find the correct value, do 'env | grep DISPLAY' in a terminal
+export DISPLAY=:1
+
+# this is an optional log file, helpful in debugging
+date >>  /tmp/randr.log
+echo "calling rand.scr" >>  /tmp/randr.log
+
+#edit to reflect the desktop user
+USER=bozo
+MONITOR_DPI=150
+LAPTOP_DPI=190
+
+# edit depening on your external monitor
+xrandr | grep "HDMI-2 connected"
+if [[ $? == 0 ]]; then
+  # external monitor is connected
+  xrandr --output HDMI-2 --auto --output eDP-1 --off
+  su - $USER /home/$USER/scripts/set_dpi.scr $MONITOR_DPI
+  echo "EXTERNAL ONLY. setting dpi 150"  $MONITOR_DPI >>  /tmp/randr.log
+else
+  # external is not connected
+  xrandr --output eDP-1 --auto
+  su - $USER /home/$USER/scripts/set_dpi.scr $LAPTOP_DPI
+  echo "LAPTOP ONLY. setting dpi " $LAPTOP_DPI   >>  /tmp/randr.log
+fi
