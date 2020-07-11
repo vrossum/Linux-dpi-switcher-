@@ -1,8 +1,10 @@
 #!/bin/bash
-# maybe autorandr does this?
-#sudo udevadm???
+# this set DPI for both GNOME and KDE applications
+# shoudl go in ~/scripts
+
 export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
 export DISPLAY=:1
+
 echo "GNOME"
 gsettings get org.mate.font-rendering dpi
 gsettings set org.mate.font-rendering dpi $1
